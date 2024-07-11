@@ -19,9 +19,20 @@ public class EventUserController {
 
     // 이메일 중복확인 API
     @GetMapping("/check-email")
-    public ResponseEntity<?> checkEmail(String email){
+    public ResponseEntity<?> checkEmail(String email) {
         boolean isDuplicate = eventUserService.checkEmailDuplicate(email);
 
         return ResponseEntity.ok().body(isDuplicate);
     }
+
+    // 인증 코드 검증 API
+    @GetMapping("/code")
+    public ResponseEntity<?> verifyCode(String email, String code){
+        log.info("{}'s verify code is {}", email, code);
+        boolean isMatch = eventUserService.isMatchCode(email,code);
+
+        return ResponseEntity.ok().body(isMatch);
+    }
+
 }
+
