@@ -1,6 +1,5 @@
 package com.study.event.api.event.controller;
 
-import com.study.event.api.event.dto.request.EventSaveDto;
 import com.study.event.api.event.dto.request.EventUserSaveDto;
 import com.study.event.api.event.service.EventUserService;
 import lombok.RequiredArgsConstructor;
