@@ -18,27 +18,27 @@ import static com.study.event.api.event.entity.QEvent.*;
 @RequiredArgsConstructor
 @Slf4j
 public class EventRepositoryCustomImpl implements EventRepositoryCustom {
-
     private final JPAQueryFactory factory;
 
     @Override
-    public Page<Event> findEvents(Pageable pageable, String sort,String userId) {
+    public Page<Event> findEvents(Pageable pageable, String sort, String userId) {
 
         // 페이징을 통한 조회
         List<Event> eventList = factory
                 .selectFrom(event)
+                .where(event.eventUser.id.eq(userId))
                 .orderBy(specifier(sort))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         // 총 데이터 수 조회
-        Long count = factory.select(event.count())
+        Long count = factory
+                .select(event.count())
                 .from(event)
                 .fetchOne();
 
-
-        return new PageImpl<>(eventList,pageable,count);
+        return new PageImpl<>(eventList, pageable, count);
     }
 
     // 정렬 조건을 처리하는 메서드
@@ -53,3 +53,4 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
         }
     }
 }
+
