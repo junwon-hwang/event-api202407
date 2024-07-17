@@ -1,5 +1,7 @@
 package com.study.event.api.event.controller;
 
+import com.study.event.api.auth.TokenProvider;
+import com.study.event.api.auth.TokenProvider.TokenUserInfo;
 import com.study.event.api.event.dto.request.EventSaveDto;
 import com.study.event.api.event.dto.response.EventOneDto;
 import com.study.event.api.event.service.EventService;
@@ -22,7 +24,7 @@ public class EventController {
     // 전체 조회 요청
     @GetMapping("/page/{pageNo}")
     public ResponseEntity<?> getList(
-            @AuthenticationPrincipal String userId,
+            @AuthenticationPrincipal TokenUserInfo tokenInfo,
             @RequestParam(required = false) String sort,
             @PathVariable int pageNo) throws InterruptedException {
 
@@ -30,10 +32,10 @@ public class EventController {
             return ResponseEntity.badRequest().body("sort 파라미터가 없습니다.");
         }
 
-        Map<String, Object> events = eventService.getEvents(pageNo,sort,userId);
+        Map<String, Object> events = eventService.getEvents(pageNo,sort,tokenInfo.getUserId());
 
         // 의도적으로 2초간의 로딩을 설정
-        Thread.sleep(2000);
+        // Thread.sleep(2000);
 
         return ResponseEntity.ok().body(events);
     }
@@ -43,9 +45,9 @@ public class EventController {
     public ResponseEntity<?> register(
             // JwtAuthFilter에서 시큐리티에 등록한 데이터
             // 토큰 파싱 결과로 로그인에 성공한 회원의 PK
-            @AuthenticationPrincipal String userId,
+            @AuthenticationPrincipal TokenUserInfo tokenInfo,
             @RequestBody EventSaveDto dto) {
-        eventService.saveEvent(dto,userId);
+        eventService.saveEvent(dto,tokenInfo.getUserId());
         return ResponseEntity.ok().body("event saved!");
     }
 
