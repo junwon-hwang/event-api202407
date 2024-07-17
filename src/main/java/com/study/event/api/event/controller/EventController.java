@@ -8,6 +8,7 @@ import com.study.event.api.event.service.EventService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,18 +25,22 @@ public class EventController {
     // 전체 조회 요청
     @GetMapping("/page/{pageNo}")
     public ResponseEntity<?> getList(
+            // 토큰파싱 결과로 로그인에 성공한 회원의 PK
             @AuthenticationPrincipal TokenUserInfo tokenInfo,
             @RequestParam(required = false) String sort,
-            @PathVariable int pageNo) throws InterruptedException {
+            @PathVariable int pageNo
+    ) throws InterruptedException {
 
-        if(sort ==null){
+        log.info("token info : {}", tokenInfo);
+
+        if (sort == null) {
             return ResponseEntity.badRequest().body("sort 파라미터가 없습니다.");
         }
 
-        Map<String, Object> events = eventService.getEvents(pageNo,sort,tokenInfo.getUserId());
+        Map<String, Object> events = eventService.getEvents(pageNo, sort, tokenInfo.getUserId());
 
         // 의도적으로 2초간의 로딩을 설정
-        // Thread.sleep(2000);
+//        Thread.sleep(2000);
 
         return ResponseEntity.ok().body(events);
     }
@@ -44,19 +49,20 @@ public class EventController {
     @PostMapping
     public ResponseEntity<?> register(
             // JwtAuthFilter에서 시큐리티에 등록한 데이터
-            // 토큰 파싱 결과로 로그인에 성공한 회원의 PK
-            @AuthenticationPrincipal TokenUserInfo tokenInfo,
-            @RequestBody EventSaveDto dto) {
-        eventService.saveEvent(dto,tokenInfo.getUserId());
+            @AuthenticationPrincipal TokenUserInfo userInfo,
+            @RequestBody EventSaveDto dto
+    ) {
+
+        eventService.saveEvent(dto, userInfo.getUserId());
         return ResponseEntity.ok().body("event saved!");
     }
 
-
     // 단일 조회 요청
+    @PreAuthorize("hasAuthority('PREMIUM') or hasAuthority('ADMIN')")
     @GetMapping("/{eventId}")
-    private ResponseEntity<?> getEvent(@PathVariable Long eventId){
+    public ResponseEntity<?> getEvent(@PathVariable Long eventId) {
 
-        if(eventId == null || eventId < 1){
+        if (eventId == null || eventId < 1) {
             String errorMessage = "eventId가 정확하지 않습니다.";
             log.warn(errorMessage);
             return ResponseEntity.badRequest().body(errorMessage);
@@ -69,18 +75,23 @@ public class EventController {
 
     // 삭제 요청
     @DeleteMapping("/{eventId}")
-    public ResponseEntity<?> delete(@PathVariable Long eventId){
+    public ResponseEntity<?> delete(@PathVariable Long eventId) {
+
         eventService.deleteEvent(eventId);
-        return ResponseEntity.ok().body("event deleted");
-    };
+
+        return ResponseEntity.ok().body("event deleted!");
+    }
 
     // 수정 요청
     @PatchMapping("/{eventId}")
-    public ResponseEntity<?> modify(@RequestBody EventSaveDto dto,
-                                    @PathVariable Long eventId) {
-        eventService.modifyEvent(dto,eventId);
+    public ResponseEntity<?> modify(
+            @RequestBody EventSaveDto dto,
+            @PathVariable Long eventId
+    ) {
+        eventService.modifyEvent(dto, eventId);
 
-        return ResponseEntity.ok().body("event modified");
+        return ResponseEntity.ok().body("event modified!!");
     }
+
 
 }
