@@ -83,7 +83,7 @@ public class EventController {
     public ResponseEntity<?> delete(@PathVariable Long eventId) {
 
         eventService.deleteEvent(eventId);
-//        eventService.deleteEvent(eventId);
+
 
         return ResponseEntity.ok().body("event deleted!");
     }
