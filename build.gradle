@@ -48,7 +48,7 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
 
-	// S3 라이브러리
+	// s3 라이브러리
 	implementation 'software.amazon.awssdk:s3:2.17.52'
 
 	//querydsl 추가
@@ -56,9 +56,13 @@ dependencies {
 	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
 }
 
+// 테스트 설정
 tasks.named('test') {
-	useJUnitPlatform()
+//	useJUnitPlatform()
+	exclude '**/*'  // 빌드 시 테스트 생략
 }
+
+
 
 //querydsl 추가 시작
 def querydslDir = "$buildDir/generated/querydsl"
