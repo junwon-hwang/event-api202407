@@ -4,7 +4,7 @@ name: Deploy Spring Application to AWS EC2
 on:
   push:
     branches:
-      - main
+      - master
 
 # 'build-and-deploy' 작업을 정의합니다. 이 작업은 ubuntu-latest 환경에서 실행됩니다.
 jobs:
