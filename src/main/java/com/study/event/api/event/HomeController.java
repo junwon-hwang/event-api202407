@@ -9,6 +9,6 @@ public class HomeController {
 
     @GetMapping("/")
     public ResponseEntity<?> home() {
-        return ResponseEntity.ok().body("zzzzㅋㅋ");
+        return ResponseEntity.ok().body("DockerTest");
     }
 }
